@@ -6,6 +6,7 @@
 기타1 : 10주차 과제 1번 코드
 기타2 :	본인의 공부와 이해를 돕기 위한 상세 주석 추가
 기타3 : 출력문 수정 및 추가로 시뮬레이션 진행 상황을 더 명확하게 표현
+기타4 : 디버그 출력 메세지 추가
 etc : 공백
 */
 
@@ -62,7 +63,7 @@ int is_full(QueueType *q)
 // 출력에 대한 알고리즘이 있음 -> 큐의 요소들을 순회하면서 출력하는 방식
 void queue_print(QueueType *q)
 {
-	printf("QUEUE(front=%d rear=%d) = ", q->front, q->rear);
+	printf("DEBUG: QUEUE(front=%d rear=%d) = ", q->front, q->rear);
 	if (!is_empty(q)) {
 			int i = q->front;
 			do {
@@ -83,6 +84,8 @@ void enqueue(QueueType *q, element item)
 		error("큐가 포화상태입니다");			// 위에서 선언한 오류 함수(void error(char *message)) 호출
 	q->rear = (q->rear + 1) % MAX_QUEUE_SIZE;
 	q->data[q->rear] = item;
+	printf("DEBUG: enqueue -> front=%d rear=%d\n", q->front, q->rear);
+	queue_print(q);
 }
 
 // 삭제 함수
@@ -91,7 +94,10 @@ element dequeue(QueueType *q)
 	if (is_empty(q))
 		error("큐가 공백상태입니다");
 	q->front = (q->front + 1) % MAX_QUEUE_SIZE;
-	return q->data[q->front];
+	element item = q->data[q->front];
+	printf("DEBUG: dequeue -> front=%d rear=%d\n", q->front, q->rear);
+	queue_print(q);
+	return item;
 }
 
 // 큐 peek 함수: 검출용 함수
@@ -126,9 +132,9 @@ int main(void)
 			customer.id = total_customers++;  // 고객 ID 할당 및 총 고객 수 증가
 			customer.arrival_time = clock;    // 도착 시간 설정
 			customer.service_time = rand() % 3+1;  // 서비스 시간: 1~3분 랜덤
-			enqueue(&queue, customer);  // 고객을 큐에 추가
 			printf("Entry : 고객 %d이 %d분에 들어옵니다. 업무처리시간= %d분\n", 
 				customer.id, customer.arrival_time, customer.service_time);
+			enqueue(&queue, customer);  // 고객을 큐에 추가
 		}
 		// 서비스 처리: 현재 서비스 중인 고객이 있으면 시간 감소
 		if (service_time > 0) {
